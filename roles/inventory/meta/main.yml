@@ -1,0 +1,18 @@
+galaxy_info:
+  author: Julien Guillod <julien.guillod@sorbonne-universite.fr>
+  description: Role to construct hosts inventory as a CSV file with hostname, ip adress, mac addresse, and service tag.
+  company: Sorbonne University
+  license: AGPL-3.0-only
+  min_ansible_version: 2.11
+  platforms:
+  - name: Ubuntu
+    versions: [all]
+  - name: Debian
+    versions: [all]
+  galaxy_tags:
+  - labs
+  - tp
+  - mathematics
+  - su
+  - inventory
+dependencies: []

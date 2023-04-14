@@ -1,0 +1,21 @@
+argument_specs:
+  main:
+    short_description: Manage custom apt repository with aptly
+    description:
+     - Install and setup an aptly repository;
+     - Create a GPG key to sign the repository if needed;
+     - Install and setup nginx to serve the repository.
+    options:
+      ntp_server:
+        type: "str"
+        default: 'ntp.ubuntu.com'
+        description: "ntp server"
+      repository_name:
+        type: "str"
+        default: "focal-tp"
+        description: "name of the custom repository"
+      allowed_ips:
+        type: "list"
+        elements: "str"
+        default: ['any']
+        description: "list of ip ranges allowed access the repository"

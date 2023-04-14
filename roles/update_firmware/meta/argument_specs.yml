@@ -1,0 +1,7 @@
+argument_specs:
+  main:
+    short_description: Upgrade firmware using C(fwupd)
+    description:
+     - Refresh list of firmware;
+     - Determine if update available;
+     - Update firmware.

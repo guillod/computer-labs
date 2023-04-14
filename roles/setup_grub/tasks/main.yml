@@ -1,0 +1,41 @@
+- name: Disable grub recovery mode
+  lineinfile:
+    dest: /etc/default/grub
+    regex: 'GRUB_DISABLE_RECOVERY='
+    line: 'GRUB_DISABLE_RECOVERY="true"'
+    state: present
+  become: true
+  notify: update grub
+
+- name: Encrypt password
+  expect:
+    command: grub-mkpasswd-pbkdf2
+    responses:
+      'Enter password:': "{{ grub_password }}"
+      'Reenter password:': "{{ grub_password }}"
+  environment:
+    LANG: en_EN.UTF8
+  no_log: true
+  when: grub_password is defined
+  register: _response
+
+- name: Add grub password
+  template:
+    src: 50_password
+    dest: /etc/grub.d/50_password
+    mode: +x
+  vars:
+    pbkdf2: "{{ _response.stdout | regex_search('grub.pbkdf2.*') }}"
+  become: true
+  when: grub_password is defined
+  notify: update grub
+
+- name: Allow first grub entry without password
+  replace:
+    dest: /etc/grub.d/10_linux
+    regexp: menuentry '\$\(echo "\$os" \| grub_quote\)' \$\{CLASS\} \\\$menuentry_id_option 'gnulinux\-simple\-\$boot_device_id' \{ 
+    replace: menuentry '$(echo "$os" | grub_quote)' ${CLASS} \$menuentry_id_option 'gnulinux-simple-$boot_device_id' --unrestricted {
+    backup: yes
+  become: true
+  when: grub_password is defined
+  notify: update grub

@@ -1,0 +1,9 @@
+- name: Shutdown computers
+  hosts: computers
+  gather_facts: no
+  
+  tasks:
+
+  - name: Shutdown
+    command: shutdown +1
+    become: true

@@ -1,0 +1,43 @@
+- name: Install pip
+  apt:
+    name:
+      - python3-pip
+      - python3-testresources
+  become: true
+
+- name: List pip packages installed in /usr/local
+  script:
+    cmd: list-packages-local.py
+  register: _response
+  when: purge
+
+- name: Purge pip packages installed in /usr/local
+  pip:
+    name: "{{ _response.stdout }}"
+    state: absent
+  become: true
+  when: purge
+
+- name: Upgrade pip
+  pip:
+    name: "pip"
+    executable: pip3
+    extra_args: "--prefix='/usr/local' --upgrade"
+  become: true
+  when: upgrade
+
+- name: Install packages
+  pip:
+    name: "{{ packages }}"
+    executable: pip3
+    extra_args: "--prefix='/usr/local'{{ ' --upgrade --ignore-installed' if upgrade }}"
+  become: true
+  register: _response
+  failed_when: "'ERROR' in _response.stderr"
+
+- name: Additional hooks
+  include_tasks: "{{ package }}.yml"
+  when: "lookup('fileglob', role_path+'/tasks/'+package+'.yml', wantlist=True)"
+  loop: "{{ packages | map('regex_replace', '[=<>!].*', '') | list }}"
+  loop_control:
+    loop_var: package

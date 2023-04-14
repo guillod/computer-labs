@@ -1,0 +1,3 @@
+delegate_build_to: localhost
+build_path: /tmp/systemd
+software_server: tp-server

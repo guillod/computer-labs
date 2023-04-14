@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.0
+Name=Bureau de l'UTES
+Comment=Accéder au bureau à distance de l'UTES
+TryExec=remmina-file-wrapper
+Exec=remmina-file-wrapper /opt/lutes-rdp/bdl-ext-1-lutes-upmc-fr.remmina
+Terminal=false
+Type=Application
+Icon=org.remmina.Remmina
+StartupNotify=true
+Categories=Development;Education;
+Keywords=remote desktop;rdp;
+StartupWMClass=org.remmina.Remmina
+MimeType=x-scheme-handler/rdp;x-scheme-handler/spice;x-scheme-handler/vnc;x-scheme-handler/remmina;application/x-remmina;

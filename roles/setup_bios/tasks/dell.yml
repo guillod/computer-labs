@@ -1,0 +1,30 @@
+- name: Install Dell Command manager
+  apt:
+    name: command-configure
+  become: true
+
+- name: Add BIOS password
+  command: /opt/dell/dcc/cctk --SetupPwd={{bios_password}}
+  register: bios_password_result
+  failed_when: bios_password_result.rc != 41 and bios_password_result.rc != 0
+  changed_when: bios_password_result.rc == 0
+  become: true
+  no_log: true
+
+- name: Get BIOS service tag
+  command: /opt/dell/dcc/cctk --SvcTag
+  register: _response
+  changed_when: False
+  become: true
+
+- name: Set fact for service tag
+  set_fact:
+    service_tag: "{{ _response.stdout | regex_search(regexp,'\\1') | first }}"
+    cacheable: yes
+  vars:
+    regexp: 'SvcTag=([^"]+)'  
+
+- name: Modify BIOS settings
+  include_tasks: "dell_bios_settings.yml"
+  with_dict: "{{ bios_settings }}"
+  no_log: true

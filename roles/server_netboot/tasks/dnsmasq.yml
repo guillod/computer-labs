@@ -1,0 +1,62 @@
+- name: Install dnsmasq
+  apt:
+    name: dnsmasq
+  become: true
+
+- name: Disable DNS stub resolver
+  lineinfile:
+    dest: /etc/systemd/resolved.conf
+    state: present
+    regexp: "DNSStubListener="
+    line: "DNSStubListener=no"
+  become: true
+  notify: restart systemd-resolved
+
+- name: Correct link to resolv.conf
+  file:
+    src: /run/systemd/resolve/resolv.conf
+    dest: /etc/resolv.conf
+    state: link
+  become: true
+
+- name: Determine DNS server
+  command: resolvectl dns
+  register: _response
+
+- name: Configure dnsmasq
+  template:
+    src: dnsmasq.conf
+    dest: /etc/dnsmasq.conf
+  vars:
+    address_mask: "{{ ansible_default_ipv4.gateway + '/' + ansible_default_ipv4.prefix }}"
+    dns_server: "{{ _response.stdout | regex_search('\\(.*\\): (.*)$', '\\1') | first }}"
+  become: true
+  notify: restart dnsmasq
+
+- name: Check if dnsmasq-hosts.conf exists
+  local_action: stat path=files/dnsmasq-hosts.conf
+  register: _response
+
+- name: Add hostnames if dnsmasq-hosts.conf provided
+  copy:
+    src: dnsmasq-hosts.conf
+    dest: /etc/dnsmasq-hosts.conf
+  become: true
+  when: _response.stat.exists
+
+- name: Open DNS/DHCP port on firewall
+  ufw:
+    rule: allow
+    port: "{{ item }}"
+  become: true
+  loop:
+    - 53
+    - 67
+
+- name: Open TFTP port on firewall
+  ufw:
+    rule: allow
+    port: 69
+    from_ip: "{{ item }}"
+  become: true
+  loop: "{{ allowed_ips | default(['any']) }}"

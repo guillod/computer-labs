@@ -1,0 +1,29 @@
+argument_specs:
+  main:
+    short_description: Setup LDAP authentication and NFS homes
+    description:
+     - Install SSSD and NFS;
+     - Configure NFS with systemd Mount and AutoMount;
+     - Configure LDAP authentication through SSSD;
+     - Enable and restart corresponding systemd services.
+    options:
+      domain:
+        type: "str"
+        required: true
+        description: "sssd domain"
+      ldap_uri:
+        type: "str"
+        required: true
+        description: "LDAP uri (may include more than one)"
+      ldap_search_base:
+        type: "str"
+        required: true
+        description: "LDAP search base"
+      nfs_server:
+        type: "str"
+        required: true
+        description: "NFS server"
+      nfs_home_path:
+        type: "str"
+        required: true
+        description: "home path provided by LDAP to be mounted with NFS"

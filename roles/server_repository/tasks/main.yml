@@ -1,0 +1,13 @@
+- name: customize
+  import_role:
+    name: setup_custom
+    tasks_from: "initial"
+
+- name: gpg
+  import_tasks: "gpg.yml"
+
+- name: aptly
+  import_tasks: "aptly.yml"
+
+- name: nginx
+  import_tasks: "nginx.yml"

@@ -1,0 +1,13 @@
+- name: customize
+  import_role:
+    name: setup_custom
+    tasks_from: "initial"
+
+- name: nginx
+  include_tasks: "nginx.yml"
+
+- name: dnsmasq
+  include_tasks: "dnsmasq.yml"
+
+- name: grub
+  include_tasks: "grub.yml"

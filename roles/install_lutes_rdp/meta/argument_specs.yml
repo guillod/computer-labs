@@ -1,0 +1,6 @@
+argument_specs:
+  main:
+    short_description: Configure the remote desktop for Sorbonne University students
+    description:
+     - Copy RDP files to C(/opt/lutes-rdp) (this includes a remmina file);
+     - Add desktop shortcut to the remmina file.

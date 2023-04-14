@@ -1,0 +1,13 @@
+galaxy_info:
+  author: Julien Guillod <julien.guillod@sorbonne-universite.fr>
+  description: Role to power on computers using wake on LAN.
+  company: Sorbonne University
+  license: AGPL-3.0-only
+  min_ansible_version: 2.11
+  galaxy_tags:
+  - labs
+  - tp
+  - mathematics
+  - su
+  - wol
+dependencies: []

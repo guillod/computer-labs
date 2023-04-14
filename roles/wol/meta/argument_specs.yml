@@ -1,0 +1,13 @@
+argument_specs:
+  main:
+    short_description: Wake on LAN
+    description:
+     - BIOS should be configured to allow WOL;
+     - MAC addresses have to be present in Ansible cache (consider adding C(fact_caching) with C(fact_caching_timeout=0) to Ansible configuration);
+     - Perform WOL using cached MAC addresses to C(broadcast);
+     - Wait until SSH is ready.
+    options:
+      broadcast:
+        type: "str"
+        default: "255.255.255.255"
+        description: "broadcast mask to send wol packets"

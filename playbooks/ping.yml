@@ -1,0 +1,7 @@
+- name: Ping
+  hosts: computers
+  gather_facts: no
+
+  roles:
+
+    - role: ufrmath.computer_labs.ping

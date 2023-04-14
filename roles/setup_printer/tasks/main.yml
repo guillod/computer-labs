@@ -1,0 +1,21 @@
+- name: Prevent automatic discovery
+  systemd:
+    name: "{{ item }}"
+    state: stopped
+    enabled: no
+  loop:
+    - cups-browsed
+    - avahi-daemon
+  become: true
+  when: false
+
+- name: Check if printer {{ printer_name }} already defined
+  command: "lpstat -p {{ printer_name }}"
+  changed_when: false
+  failed_when: false
+  register: _response
+
+- name: Add printer {{ printer_name }}
+  command: "lpadmin -p {{ printer_name }} -E -v ipp://{{ printer_ip }}/ipp/print -m everywhere"
+  become: true
+  when: "'Invalid destination name' in _response.stderr"

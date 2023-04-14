@@ -1,0 +1,24 @@
+argument_specs:
+  main:
+    short_description: Build patched version of systemd to allow numerical login
+    description:
+     - Original PAM module C(pam_systemd.so) provided by C(libpam-systemd) prevents users with purely numerical username to login through gdm;
+     - Build a patched version C(libpam-systemd-patch) of C(libpam-systemd) on the host C(delegate_build_to);
+     - Upload C(libpam-systemd-patch_*.deb) to C(software_server) custom repository;
+     - Install C(libpam-systemd-patch) corresponding to C(systemd) version without any upgrade, which automatically uninstall C(libpam-systemd).
+    options:
+      delegate_build_to: 
+        type: "str"
+        required: false
+        default: localhost
+        description: "host on which to build systemd"
+      build_path:
+        type: "str"
+        required: false
+        default: /tmp/systemd
+        description: "path where to build systemd"
+      software_server:
+        type: "str"
+        default: tp-server
+        description: "host on which to upload patched systemd"
+      

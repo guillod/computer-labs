@@ -1,0 +1,26 @@
+argument_specs:
+  main:
+    short_description: Setup server for netboot
+    description:
+     - Customize quickly the server;
+     - Install and configure nginx to serve netboot;
+     - Install and configure dnsmasq for netboot;
+     - Add grub and preseed configurations.
+    options:
+      ntp_server:
+        type: "str"
+        default: 'ntp.ubuntu.com'
+        description: "ntp server"
+      ubuntu_version:
+        type: "str"
+        default: "20.04.6"
+        description: "version of Ubuntu to install with netboot"
+      ubuntu_codename:
+        type: "str"
+        default: "focal"
+        description: "codename of Ubuntu to install with netboot"
+      allowed_ips:
+        type: "list"
+        elements: "str"
+        default: ['any']
+        description: "list of ip ranges allowed to access TFTP and HTTP servers"

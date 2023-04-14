@@ -1,0 +1,7 @@
+- name: Construct inventory including service tag
+  hosts: computers
+  gather_facts: no
+  serial: 1
+  
+  roles:
+  - role: ufrmath.computer_labs.inventory

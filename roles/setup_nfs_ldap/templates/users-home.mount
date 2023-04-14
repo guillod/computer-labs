@@ -1,0 +1,10 @@
+[Unit]
+Description=Mount Home
+
+[Mount]
+What={{ nfs_server }}:{{ nfs_home_path }}
+Where={{ nfs_home_path }}
+Type=nfs
+
+[Install]
+WantedBy=multi-user.target

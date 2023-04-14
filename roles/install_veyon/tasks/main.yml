@@ -1,0 +1,72 @@
+- name: Install Veyon
+  apt:
+    name: veyon
+  become: true 
+
+- name: Open port for veyon
+  ufw:
+    rule: allow
+    proto: tcp
+    port: "11100,11400"
+  become: true
+
+- name: Create directory for public key
+  file:
+    path: /etc/veyon/keys/public/tp_sb/
+    state: directory
+  become: true
+
+- name: Add public key
+  copy:
+    src: veyon_public.key
+    dest: /etc/veyon/keys/public/tp_sb/key
+    mode: 0644
+  become: true
+
+- name: Create config directory
+  file:
+    path: "/etc/xdg/Veyon Solutions/"
+    state: directory
+  become: true
+
+- name: Add config
+  copy:
+    src: Veyon.conf
+    dest: "/etc/xdg/Veyon Solutions/Veyon.conf"
+  become: true
+  notify: enable and start veyon service
+
+- name: Show all computers
+  lineinfile:
+    dest: /etc/xdg/Veyon Solutions/Veyon.conf
+    regex: "ShowCurrentLocationOnly="
+    line: "ShowCurrentLocationOnly=false"
+    state: present
+  become: true
+  when: show_all_hosts
+
+- name: Remove Veyon configurator
+  file:
+    name: "{{item}}"
+    state: absent
+  loop:
+    - /usr/share/applications/veyon-configurator.desktop
+    - /usr/bin/veyon-configurator
+  become: true
+  when: remove_configurator
+
+- name: Create directory for private key
+  file:
+    path: /etc/veyon/keys/private/tp_sb/
+    state: directory
+  become: true
+  when: install_private_key
+
+- name: Add private key
+  copy:
+    src: veyon_private.key
+    dest: /etc/veyon/keys/private/tp_sb/key
+    mode: 0640
+    group: "Default Group"
+  become: true
+  when: install_private_key

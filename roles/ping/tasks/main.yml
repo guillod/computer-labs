@@ -1,0 +1,15 @@
+- name: Ping
+  local_action: command ping -c 1 -w 1 {{ ansible_default_ipv4.address }}
+  register: ping
+  failed_when: false
+
+- name: Get users
+  shell: who | grep -v admin
+  when: ping.rc == 0
+  register: users
+  failed_when: false
+
+- name: Print users
+  debug:
+    var: users.stdout
+  when: ping.rc == 0 and users.rc == 0

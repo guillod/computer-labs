@@ -1,0 +1,22 @@
+- name: Add networkd to netplan
+  template:
+    src: 01-networkd.yaml
+    dest: /etc/netplan/01-networkd.yaml
+    backup: yes
+  become: true
+  notify:
+    - apply netplan
+
+- name: Remove NetworkManager from netplan
+  file:
+    path: /etc/netplan/01-network-manager-all.yaml
+    state: absent
+  become: true
+  notify:
+    - apply netplan
+
+- name: Disable NetworkManager
+  systemd:
+    name: NetworkManager
+    enabled: false
+  become: true

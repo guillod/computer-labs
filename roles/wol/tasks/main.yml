@@ -1,0 +1,9 @@
+- name: Wake on LAN
+  wakeonlan:
+    mac: '{{ ansible_default_ipv4.macaddress }}'
+    broadcast: '{{ broadcast }}'
+  delegate_to: tp-server
+
+- name: Wait for connection
+  wait_for_connection:
+    timeout: 120

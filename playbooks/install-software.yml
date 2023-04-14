@@ -1,0 +1,28 @@
+---
+- name: Install software
+  hosts: computers
+  gather_facts: no
+
+  collections:
+    - ufrmath.computer_labs
+
+  roles:
+
+    - role: wol
+
+    - role: install_apt
+    
+    - role: install_lutes_rdp
+
+    - role: install_pip
+      packages:
+        - jupyterlab==3.6.1
+        - jupyterlab-lsp==3.10.2
+        - python-lsp-server[all]==1.7.1
+        - relife
+      upgrade: yes
+
+    - role: install_veyon
+      remove_configurator: "{{ 'debug' not in group_names }}"
+      show_all_hosts: "{{ 'debug' in group_names }}"
+      install_private_key: "{{ 'master' in group_names }}"

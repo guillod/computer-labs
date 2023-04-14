@@ -1,0 +1,56 @@
+- name: Protect admin account
+  file:
+    path: /home/admin
+    mode: 0750
+  become: true
+
+- name: Add SSH key
+  authorized_key:
+    user: admin
+    state: present
+    key: "{{lookup('file', 'id_key.pub') }}"
+
+- name: No password on sudo for admin
+  copy:
+    content: |
+      # no password on sudo for user admin
+      admin ALL=(ALL:ALL) NOPASSWD:ALL
+    dest: /etc/sudoers.d/01-nopasswd
+    backup: yes
+    mode: 444
+  become: true
+
+- name: Update hostname
+  hostname:
+    name: "{{ inventory_hostname_short }}"
+  become: true
+
+- name: Change /etc/hosts
+  lineinfile:
+    dest: /etc/hosts
+    regexp: '^127\.0\.1\.1[ \t]+'
+    line: '127.0.1.1 {{ inventory_hostname_short }}'
+  become: true
+
+- name: Modify ntp server
+  lineinfile:
+    dest: /etc/systemd/timesyncd.conf
+    regexp: '^#?NTP='
+    state: present
+    line: 'NTP={{ ntp_server }}'
+  become: true
+  notify: restart timesyncd
+
+- name: Disable crash reports
+  lineinfile:
+    dest: /etc/default/apport
+    regex: "^enabled="
+    line: "enabled=0"
+  become: true
+
+- name: Configure ufw to deny incoming except ssh
+  ufw:
+    rule: allow
+    port: ssh
+    state: enabled
+  become: true

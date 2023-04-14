@@ -1,0 +1,5 @@
+- name: restart gdm
+  systemd:
+    name: gdm
+    state: restarted
+  become: true

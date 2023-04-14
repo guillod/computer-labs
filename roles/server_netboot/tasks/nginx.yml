@@ -1,0 +1,31 @@
+- name: Install nginx
+  apt:
+    name: nginx
+  become: true
+
+- name: Create a directory for netboot
+  file:
+    path: /var/www/netboot
+    state: directory
+  become: true
+
+- name: Add netboot to nginx configuration
+  blockinfile:
+    path: /etc/nginx/sites-available/default
+    block: |2
+      	location /netboot {
+      		alias /var/www/netboot;
+      	}
+    insertbefore: '^}$'
+    backup: true
+    marker: "	# {mark} netboot block"
+  become: true
+  notify: reload nginx
+
+- name: Open firewall port
+  ufw:
+    rule: allow
+    port: http
+    from_ip: "{{ item }}"
+  become: true
+  loop: "{{ allowed_ips | default(['any']) }}"

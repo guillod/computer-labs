@@ -1,0 +1,18 @@
+- name: Get Veyon download urls
+  delegate_to: localhost
+  run_once: true
+  uri:
+    url: "https://api.github.com/repos/veyon/veyon/releases/{{ 'tags/v' if version!='latest' }}{{ version }}"
+  vars:
+    version: "{{ packages[package] }}"
+  register: _response
+
+- name: Download Veyon {{ version }}
+  get_url:
+    url: "{{ url }}"
+    dest: "{{ unarchive_path }}"
+  when: ( not aptly_packages[package] ) or ( version is version(aptly_packages[package], '>') )
+  vars:
+    url: "{{ _response.json | to_json | from_json | json_query(query) | first }}"
+    version: "{{ _response.json.tag_name[1:] }}"
+    query: "assets[?contains(name,'focal_amd64')].browser_download_url"

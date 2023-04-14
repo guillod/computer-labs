@@ -1,0 +1,28 @@
+- name: Install aptly
+  apt:
+    name: aptly
+  become: true
+
+- name: Add configuration file
+  template:
+    src: "aptly.conf"
+    dest: "/etc/aptly.conf"
+  become: true
+
+- name: Create repository
+  command:
+    cmd: "aptly repo create -distribution={{ repository_name }} -component=main {{ repository_name }}"
+  become: true
+  register: _response
+  changed_when: "'local repo with name ' + repository_name + ' already exists' not in _response.stderr"
+  failed_when: "_response.rc != 0 and 'local repo with name ' + repository_name + ' already exists' not in _response.stderr"
+
+- name: Publish repository
+  command:
+    cmd: "aptly -architectures='amd64,i386' publish repo {{ repository_name }} :ubuntu"
+  become: true
+  environment:
+    HOME: "/home/admin"
+  register: _response
+  changed_when: "'prefix/distribution already used by another published repo' not in _response.stderr"
+  failed_when: "_response.rc != 0 and 'prefix/distribution already used by another published repo' not in _response.stderr"

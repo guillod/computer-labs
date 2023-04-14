@@ -1,0 +1,36 @@
+- name: Get apt sources
+  slurp:
+    src: /etc/apt/sources.list
+  register: _sources
+
+- name: Enable deb-src repositories
+  lineinfile:
+    dest: /etc/apt/sources.list
+    regex: "{{ item }}"
+    line: "{{ item }}"
+    state: present
+  become: true
+  loop: "{{ _sources.content | b64decode | regex_findall('^deb .*$', multiline=True) | map('regex_replace', 'deb', 'deb-src') }}"
+
+- name: Install build system
+  apt:
+    name:
+      - devscripts
+      - quilt
+    update_cache: yes
+  become: true
+
+- name: Install systemd build dependencies
+  apt:
+    name: systemd
+    state: build-dep
+  become: true
+
+- name: Build patched systemd {{ versions | join(', ') }}
+  include_tasks: build_one_systemd.yml
+  loop: "{{ versions }}"
+  loop_control:
+    loop_var: version
+
+- name: Flush handlers
+  meta: flush_handlers

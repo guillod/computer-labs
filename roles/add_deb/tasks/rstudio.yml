@@ -1,0 +1,18 @@
+- name: Get RStudio latest version
+  delegate_to: localhost
+  run_once: true
+  uri:
+    url: http://download1.rstudio.org/current.ver
+    return_content: yes
+  register: _response
+  when: packages[package] == 'latest'
+
+- name: Download RStudio {{ version }}
+  get_url:
+    url: "https://download1.rstudio.org/electron/bionic/amd64/rstudio-{{ version }}-amd64.deb"
+    dest: "{{ unarchive_path }}"
+  when: ( not aptly_packages[package] ) or ( version is version(aptly_packages[package] | regex_replace('\\+','-'), '>') )
+  vars:
+    version: "{{ latest_version if latest_version else packages[package] }}"
+    latest_version: "{{ _response.content | regex_replace('\\+','-') | regex_search('^[0-9.]+[-][0-9]+') if _response.content is defined }}"
+  become: true

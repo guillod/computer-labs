@@ -1,0 +1,11 @@
+argument_specs:
+  main:
+    short_description: Configure grub
+    description:
+     - Disable grub recovery mode;
+     - Encrypt password and add hash to C(/etc/grub.d/50_password);
+     - Allow only first grub entry in C(/etc/grub.d/10_linux) without password.
+    options:
+      grub_password:
+        type: "str"
+        description: "optional GRUB password"

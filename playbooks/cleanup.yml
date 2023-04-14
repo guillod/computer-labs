@@ -1,0 +1,20 @@
+- name: Cleanup
+  hosts: computers
+  gather_facts: no
+
+  tasks:
+  - name: Reset brightness
+    shell: echo 100 > /sys/class/backlight/dell_uart_backlight/brightness
+    become: true
+
+  - name: Delete guest home
+    file:
+      path: /home/guest
+      state: absent
+    become: true
+
+  - name: Delete ansible cache
+    file:
+      path: /home/admin/.ansible
+      state: absent
+    become: true

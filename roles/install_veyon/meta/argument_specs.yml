@@ -1,0 +1,23 @@
+argument_specs:
+  main:
+    short_description: Install Veyon
+    description:
+     - Install Veyon through apt;
+     - Open firewall ports used by Veyon (11100,11400);
+     - Upload public key and configuration;
+     - Update configuration if C(show_all_hosts) is C(yes);
+     - Remove veyon-configurator binary if C(remove_configurator) is C(yes);
+     - Upload private key if C(install_private_key) is C(yes).
+    options:
+      install_private_key:
+        type: "bool"
+        default: no
+        description: "install private keys to control the other hosts"
+      remove_configurator:
+        type: "bool"
+        default: yes
+        description: "removes veyon configurator"
+      show_all_hosts:
+        type: "bool"
+        default: no
+        description: "control host view all hosts (if private key is installed), otherwise only the one in the same room"

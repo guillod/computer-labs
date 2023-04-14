@@ -1,0 +1,5 @@
+- name: JupyterLab desktop shortcut
+  copy:
+    src: jupyter-lab.desktop
+    dest: /usr/local/share/applications/
+  become: true

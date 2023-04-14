@@ -1,0 +1,29 @@
+- name: apt upgrade
+  apt:
+    upgrade: yes
+    update_cache: yes
+  become: true
+
+- name: apt dist-upgrade
+  apt:
+    upgrade: dist
+    update_cache: yes
+  become: true
+  when: dist_upgrade
+
+- name: apt autoclean
+  apt:
+    autoclean: yes
+  become: true
+
+- name: apt autoremove
+  apt:
+    autoremove: yes
+  become: true
+
+- name: Determine if reboot is required
+  stat:
+    path: /var/run/reboot-required
+  register: _reboot_required
+  changed_when: _reboot_required.stat.exists
+  notify: reboot

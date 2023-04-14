@@ -1,0 +1,6 @@
+argument_specs:
+  main:
+    short_description: Add guest user in GDM
+    description:
+     - Create `guest` user with empty password and prevent the change of the password;
+     - Add session scripts to wipe data on logout.

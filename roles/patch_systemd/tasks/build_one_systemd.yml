@@ -1,0 +1,69 @@
+- name: Make temporary build directory
+  file:
+    path: "{{ build_path }}"
+    state: directory
+
+- name: Download source of systemd {{ version }}
+  command:
+    cmd: "dget -d -u https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/systemd/{{ version }}/systemd_{{ version }}.dsc"
+    chdir: "{{ build_path }}"
+    creates: systemd_{{ version }}.dsc
+
+- name: Extract files of systemd {{ version }}
+  command:
+    cmd: "dpkg-source -x systemd_{{ version }}.dsc {{ version }}"
+    chdir: "{{ build_path }}"
+    creates: "{{ version }}"
+
+- name: Upload patch allowing numerical login
+  copy:
+    src: allow_numerical_user.patch
+    dest: "{{ build_path }}"
+
+- name: Import patch allowing numerical login
+  command:
+    cmd: quilt import ../allow_numerical_user.patch
+    chdir: "{{ build_path }}/{{ version }}"
+    creates: "debian/patches/allow_numerical_user.patch"
+
+- name: List files starting with libpam-systemd
+  find:
+    paths: "{{ build_path }}/{{ version }}/debian/"
+    patterns: "libpam-systemd.*"
+  register: _find_files
+
+- name: Rename files debian/libpam-systemd.*
+  command:
+    cmd: "mv {{ old_file }} {{ new_file }}"
+    chdir: "{{ build_path }}/{{ version }}/debian"
+    creates: "{{ new_file }}"
+    removes: "{{ old_file }}"
+  vars:
+    old_file: "{{ item }}"
+    new_file: "{{ item | replace('libpam-systemd.','libpam-systemd-patch.') }}"
+  loop: "{{ _find_files.files | json_query('[].path') }}"
+
+- name: Modifying debian/control file
+  replace:
+    path: "{{ build_path }}/{{ version }}/debian/control"
+    regexp: '^Package: libpam-systemd$([\s\S]*)^Provides:(.*)'
+    replace: 'Package: libpam-systemd-patch\1Provides:\2, libpam-systemd (= ${binary:Version})\nConflicts: libpam-systemd\nReplaces: libpam-systemd'
+
+- name: Build systemd {{ version }}
+  command:
+    cmd: debuild -b -us -uc
+    chdir: "{{ build_path }}/{{ version }}"
+    creates: "{{ build_path }}/libpam-systemd-patch_{{ version }}_amd64.deb"
+
+- name: Fetch generated libpam-systemd-patch {{ version }} to localhost
+  fetch:
+    src: "{{ build_path }}/libpam-systemd-patch_{{ version }}_amd64.deb"
+    dest: "/tmp/libpam-systemd-patch_{{ version }}_amd64.deb"
+    flat: yes
+
+- name: Add package libpam-systemd-patch {{ version }} to repository
+  delegate_to: "{{ software_server }}"
+  import_role:
+    name: add_deb
+  vars:
+    files: ["/tmp/libpam-systemd-patch_{{version}}_amd64.deb"]

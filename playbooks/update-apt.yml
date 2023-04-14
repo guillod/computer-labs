@@ -1,0 +1,11 @@
+- name: Update apt software
+  hosts: computers
+  gather_facts: no
+  
+  roles:
+
+  - role: ufrmath.computer_labs.wol
+
+  - role: ufrmath.computer_labs.update_apt
+    dist_upgrade: yes
+    delegate_build_to: tp-server

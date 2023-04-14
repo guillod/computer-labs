@@ -1,0 +1,35 @@
+  - name: Create guest user
+    user:
+      name: guest
+      password: ''
+      password_expire_min: 99999
+      comment: Guest
+      shell: /bin/bash
+    become: true
+
+  - name: Add session scripts (wipe guest data,...)
+    copy:
+      src: "{{ item }}.sh"
+      dest: "/etc/gdm3/{{ item }}/Default"
+      mode: +x
+    loop:
+      - "PostSession"
+      - "PostLogin"
+    become: true
+    notify: restart gdm
+
+  - name: Configure auto-login
+    lineinfile:
+      dest: /etc/gdm3/custom.conf
+      regex: "{{ item.from }}"
+      line: "{{ item.to }}"
+      state: present
+    become: true
+    loop:
+      - {from: "AutomaticLoginEnable =", to: "#AutomaticLoginEnable = true"}
+      - {from: "AutomaticLogin =", to: "#AutomaticLogin = guest"}
+      - {from: "TimedLoginEnable =", to: "#TimedLoginEnable = true"}
+      - {from: "TimedLogin =", to: "#TimedLogin = guest"}
+      - {from: "TimedLoginDelay =", to: "#TimedLoginDelay = 0"}
+    notify: restart gdm
+    when: false

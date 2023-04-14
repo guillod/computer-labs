@@ -1,0 +1,26 @@
+- name: Install sssd and nfs
+  apt:
+    name:
+      - ldap-utils
+      - sssd-ldap
+      - nfs-common
+    update_cache: yes
+  become: true
+
+- name: Configure nfs with systemd
+  template:
+    src: "{{ item }}"
+    dest: "/etc/systemd/system/{{ item }}"
+  loop:
+    - "users-home.mount"
+    - "users-home.automount"
+  become: true
+  notify: enable and start automount
+
+- name: Configure ldap
+  template:
+    src: sssd.conf
+    dest: /etc/sssd/sssd.conf
+    mode: 0600
+  become: true
+  notify: restart sssd

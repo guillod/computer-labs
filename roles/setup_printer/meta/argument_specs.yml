@@ -1,0 +1,15 @@
+argument_specs:
+  main:
+    short_description: Setup a printer
+    description:
+     - Check if C(printer_name) already defined with C(lpstat);
+     - Add printer C(printer_name) with C(lpadmin) with IPP Everywhere.
+    options:
+      printer_name: 
+        type: "str"
+        required: true
+        description: "name of the printer"
+      printer_ip:
+        type: "str"
+        required: true
+        description: "ip or hostname of the printer"

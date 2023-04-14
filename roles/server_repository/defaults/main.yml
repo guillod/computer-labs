@@ -1,0 +1,2 @@
+repository_name: "focal-tp"
+allowed_ips: ['any']

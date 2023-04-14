@@ -1,0 +1,94 @@
+argument_specs:
+
+  main:
+    short_description: Setup and customize lab's computers
+    description:
+     - Initial setup
+     - Modify machine ID
+     - Setup netplan
+     - Reboot if required
+     - Define proxy
+     - Customize
+     - Define custom repository
+    options:
+      ntp_server: 
+        type: "str"
+        default: 'ntp.ubuntu.com'
+        description: "ntp server"
+      ip_server:
+        type: "str"
+        required: false
+        description: "server ip to add to C(/etc/hosts)"
+      custom_repository:
+        type: "str"
+        required: false
+        description: "custom repository"
+
+  initial:
+    short_description: Perform initial setup
+    description:
+     - Run on clean Ubuntu Desktop installation having C(openssh-server) installed;
+     - On first run, might have to populate C(ansible_ssh_pass) and C(ansible_become_pass).
+     - On first run, wait for SSH to be ready and add SSH fingerprint to local C(~/.ssh/known_hosts);
+     - Protect admin home and add SSH key C(id_key.pub) to the hosts;
+     - Configure sudo without password for user admin;
+     - Define hostname as defined in Ansible hosts file.
+     - Add ntp server from C(ntp_server);
+     - Disable crash reports;
+     - Configure firewall with ufw to disable all incoming except ssh;
+    options:
+      ntp_server: 
+        type: "str"
+        default: 'ntp.ubuntu.com'
+        description: "ntp server"
+
+  machine_id:
+    short_description: Regenerate machine-id
+    description:
+     - Under some circumstances (custom ubuntu image, Debian preseed, same install time?), the machine-id for different machines are the same;
+     - "If C(/etc/machine-id) is not a link to C(/var/lib/dbus/machine-id): restore the link and regenerate machine-id with C(systemd-machine-id-setup)."
+
+  netplan:
+    short_description: Switch from NetworkManager to networkd
+    description:
+     - Switch using netplan from NetworkManager to networkd (using DHCP).
+     - Add netplan to use networkd;
+     - Remove default NetworkManager netplan;
+     - Disable NetworkManager;
+     - Apply new netplan.
+
+  proxy:
+    short_description: Add proxy to environment variables and apt config
+    description:
+     - Add proxy to C(/etc/environment) if C(proxy_env) is defined;
+     - Add proxy for apt if C(proxy_env) is defined;
+
+  custom:
+    short_description: Customize the computers
+    description:
+     - Switch to standard gdm theme;
+     - Add SU logo to gdm login;
+     - Add custom dconf values (favorite apps, colors, custom text in gdm login, logout on inactive, proxy settings);
+     - Hack to propagate dconf proxy settings to environments variables;
+     - Custom xdg directory (remove Pictures, Templates, Videos,...);
+     - Remove popping-up applications (gnome initial setup, reports and Deja Dup, LTS new release);
+     - Set admin user as system account (useful only when gdm list users);
+     - Allow ssh login only from user admin;
+     - Disable grub recovery and wayland;
+     - Automatic power off on idle through logind;
+     - Keep authenticated users for at least one year;
+
+  repository:
+    short_description: Add custom repository to apt sources
+    description:
+      - Add C(tp-server) to C(/etc/hosts) with ip C(ip_server);
+      - Setup custom apt repository with direct connection (no proxy).
+    options:
+      ip_server:
+        type: "str"
+        required: false
+        description: "server ip to add to C(/etc/hosts)"
+      custom_repository:
+        type: "str"
+        required: false
+        description: "custom repository"

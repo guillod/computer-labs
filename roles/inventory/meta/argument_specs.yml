@@ -1,0 +1,13 @@
+argument_specs:
+  main:
+    short_description: Write hosts inventory
+    description:
+     - Construct hosts inventory as a CSV file with hostname, ip adress, mac addresse, and service tag;
+     - All informations have to be (consider adding C(fact_caching) with C(fact_caching_timeout=0) to Ansible configuration).
+     - The service tag fact is set by the role R(setup_bios,ansible_collections.ufrmath.computer_labs.setup_bios_role);
+     - "This role has to be executed with option C(serial: 1) otherwise the CSV file might be buggy."
+    options:
+      output:
+        type: "str"
+        default: 'inventory.csv'
+        description: "CSV file to write generated inventory"

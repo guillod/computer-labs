@@ -1,0 +1,11 @@
+- name: Get BIOS settings {{ item.key }}
+  command: "/opt/dell/dcc/cctk --{{ item.key }}"
+  register: _response
+  changed_when: false
+  failed_when: false
+  become: true
+
+- name: Modify BIOS settings {{ item.key }}
+  command: "/opt/dell/dcc/cctk --{{ item.key }}={{ item.value }} --ValSetupPwd={{bios_password}}"
+  when: _response.rc != 42 and _response.stdout != item.key + '=' + item.value
+  become: true

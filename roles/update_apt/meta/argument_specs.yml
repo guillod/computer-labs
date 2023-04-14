@@ -1,0 +1,28 @@
+argument_specs:
+  main:
+    short_description: Update apt software
+    description:
+      - Execute role R(patch_systemd,ansible_collections.ufrmath.computer_labs.patch_systemd_role) to ensure candidate patched systemd is available;
+      - Perform C(apt upgrade) or C(apt dist-upgrade) if C(dist_upgrade) is set to C(yes);
+      - Perform C(apt autoclean);
+      - Perform C(apt autoremove);
+      - Restart if required.
+    options:
+      dist_upgrade:
+        type: "bool"
+        default: no
+        description: "perform a dist-upgrade, otherwise a simple upgrade is done"
+      delegate_build_to: 
+        type: "str"
+        required: false
+        default: localhost
+        description: "host on which to build systemd"
+      build_path:
+        type: "str"
+        required: false
+        default: /tmp/systemd
+        description: "path where to build systemd"
+      software_server:
+        type: "str"
+        default: tp-server
+        description: "host on which to upload patched systemd"

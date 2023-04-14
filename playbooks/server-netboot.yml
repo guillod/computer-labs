@@ -1,0 +1,13 @@
+- name: Setup netboot server
+  hosts: tp-server
+  gather_facts: yes
+
+  roles:
+
+  - role: ufrmath.computer_labs.server_netboot
+    ntp_server: ntp1.jussieu.fr
+    allowed_ips: [10.0.2.0/24, 10.0.3.0/24]
+
+  vars:
+    ansible_ssh_pass: test
+    ansible_become_pass: test

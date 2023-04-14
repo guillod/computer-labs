@@ -1,0 +1,118 @@
+- name: Find gdm gresource
+  find:
+    paths: /etc/alternatives/
+    patterns: 'gdm*.gresource'
+    file_type: any
+  register: _gdm_gresource
+
+- name: Back to standard gdm theme
+  alternatives:
+    name: "{{ (_gdm_gresource.files | first).path.split('/') | last }}"
+    path: /usr/share/gnome-shell/gnome-shell-theme.gresource
+  become: true
+
+- name: Add logo
+  copy:
+    src: ubuntu-su-logo.png
+    dest: /usr/share/plymouth/ubuntu-su-logo.png
+  become: true
+
+- name: Custom dconf values
+  template:
+    src: 20_math_settings.gschema.override
+    dest: /usr/share/glib-2.0/schemas/20_math_settings.gschema.override
+    backup: yes
+  become: true
+  notify:
+    - compile gschemas
+    - restart gdm
+
+- name: Hack to propagate gnome proxy to environment variables
+  # correct bug in GNOME shell, otherwise HTTP_PROXY is not passed to applications
+  # laucnhed by .desktop files
+  copy:
+    src: gnome_proxy_to_env.sh
+    dest: /etc/profile.d/gnome_proxy_to_env.sh
+    backup: yes
+  become: true
+  when: false #proxy_env is defined
+
+- name: Custom xdg default directories
+  copy:
+    src: user-dirs.defaults
+    dest: /etc/xdg/user-dirs.defaults
+    backup: yes
+  become: true
+
+- name: Remove gnome initial setup, reports and Deja Dup
+  apt:
+    name:
+      - gnome-initial-setup
+      - popularity-contest
+      - ubuntu-report
+      - deja-dup
+    state: absent
+  become: true
+
+- name: Disable LTS release dialog
+  lineinfile:
+    dest: /etc/update-manager/release-upgrades
+    regex: 'Prompt='
+    line: 'Prompt=never'
+    state: present
+  become: true
+
+- name: Set admin as system account
+  lineinfile:
+    dest: /var/lib/AccountsService/users/admin
+    regex: "{{ item.from }}"
+    line: "{{ item.to }}"
+    state: present
+    create: yes
+  loop:
+    - {from: '\[User\]', to: '[User]'}
+    - {from: 'SystemAccount=', to: 'SystemAccount=true'}
+  become: true
+
+- name: Only allow ssh login from admin
+  copy:
+    dest: /etc/ssh/sshd_config.d/01allowdeny.conf
+    content: AllowUsers admin
+  become: true
+  notify: restart sshd
+
+- name: Disable grub recovery mode
+  lineinfile:
+    dest: /etc/default/grub
+    regex: 'GRUB_DISABLE_RECOVERY='
+    line: 'GRUB_DISABLE_RECOVERY="true"'
+    state: present
+  become: true
+  notify: update grub
+
+- name: Disable Wayland
+  lineinfile:
+    dest: /etc/gdm3/custom.conf
+    regex: "WaylandEnable="
+    line: "WaylandEnable=false"
+    state: present
+  become: true
+  notify: restart gdm
+
+- name: Poweroff on idle
+  lineinfile:
+    dest: /etc/systemd/logind.conf
+    regex: "{{ item.from }}"
+    line: "{{ item.to }}"
+    state: present
+  become: true
+  loop:
+    - {from: "IdleAction=", to: "IdleAction=poweroff"}
+    - {from: "IdleActionSec=", to: "IdleActionSec=60min"}
+
+- name: Keep wtmp log for at least 1 year
+  lineinfile:
+    dest: /etc/logrotate.d/wtmp
+    regex: '    rotate'
+    line: '    rotate 12'
+  become: true

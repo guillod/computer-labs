@@ -1,0 +1,47 @@
+- name: Update apt cache
+  apt:
+    update_cache: yes
+  become: true
+
+- name: Get status of systemd package
+  ufrmath.computer_labs.apt_policy:
+    name: systemd
+  register: systemd_status
+
+- name: Get status of patch systemd package
+  ufrmath.computer_labs.apt_policy:
+    name: libpam-systemd-patch
+  register: systemd_patch_status
+
+- name: Delegate build of patched systemd
+  import_tasks: build_systemd.yml
+  delegate_to: "{{ delegate_build_to }}"
+  run_once: true
+  vars:
+    # get systemd_status for all hosts in play
+    all_systemd_status: "{{ ansible_play_hosts | map('extract', hostvars, 'systemd_status') }}"
+    all_systemd_patch_status: "{{ ansible_play_hosts | map('extract', hostvars, 'systemd_patch_status') }}"
+    # all installed and candidate versions
+    all_versions: "{{ all_systemd_status | json_query('[].[installed,candidate][].version') | unique }}"
+    # all available patched versions
+    patched_versions: "{{ all_systemd_patch_status | json_query('[].versions[].version') }}"
+    # all versions without patch
+    versions: "{{ all_versions | difference(patched_versions) }}"
+  when: versions
+
+- name: Install patched version
+  apt:
+    name: "libpam-systemd-patch={{ version }}"
+    update_cache: yes
+  become: true
+  vars:
+    version: "{{ systemd_status.installed.version }}"
+
+- name: Ensure candidate version available
+  apt:
+    name: "libpam-systemd-patch={{ version }}"
+  check_mode: true
+  become: true
+  changed_when: false
+  vars:
+    version: "{{ systemd_status.candidate.version }}"

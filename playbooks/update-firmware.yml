@@ -1,0 +1,10 @@
+- name: Update firmware
+  hosts: computers
+  gather_facts: no
+  serial:
+    - 1
+    - 5
+
+  roles:
+    - ufrmath.computer_labs.wol
+    - ufrmath.computer_labs.update_firmware

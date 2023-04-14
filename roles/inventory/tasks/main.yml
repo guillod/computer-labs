@@ -1,0 +1,14 @@
+- name: Write csv header
+  local_action:
+    module: lineinfile
+    dest: "{{ output }}"
+    line: "hostname,ip,mac,tag"
+    create: yes
+  run_once: true
+  when: false
+
+- name: Write csv content
+  local_action:
+    module: lineinfile
+    dest: "{{ output }}"
+    line: "{{ inventory_hostname_short }},{{ ansible_default_ipv4.address }},{{ ansible_default_ipv4.macaddress }},{{ ansible_facts.service_tag | default('nan') }}"

@@ -1,0 +1,18 @@
+galaxy_info:
+  author: Julien Guillod <julien.guillod@sorbonne-universite.fr>
+  description: Ansible role to configure Dell BIOS with Dell Command | Configure application.
+  company: Sorbonne University
+  license: AGPL-3.0-only
+  min_ansible_version: 2.11
+  platforms:
+  - name: Ubuntu
+    versions: [all]
+  - name: Debian
+    versions: [all]
+  galaxy_tags:
+  - labs
+  - tp
+  - mathematics
+  - su
+  - bios
+dependencies: []

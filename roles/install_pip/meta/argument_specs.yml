@@ -1,0 +1,23 @@
+argument_specs:
+  main:
+    short_description: Install additional python packages to C(/usr/local)
+    description:
+     - Install pip through apt;
+     - List and purge all Python packages installed in C(/usr/local) (except C(pip)) if C(purge) is C(yes);
+     - Upgrade pip if C(upgrade) is C(yes);
+     - Install all packages listed in C(packages) in C(/usr/local) with pip, with option C(--upgrade --ignore-installed) if C(upgrade) is C(yes);
+     - Run additional hooks if a tasks file C(pkg.yml) exists and C(pkg) is listed in C(packages).
+    options:
+      packages:
+        type: "list"
+        elements: "str"
+        required: true
+        description: "list of packages to install (use pip version specification)"
+      purge:
+        type: "bool"
+        default: no
+        description: "purge all packages installed in /usr/local"
+      upgrade:
+        type: "bool"
+        default: no
+        description: "upgrade listed packages if already installed"

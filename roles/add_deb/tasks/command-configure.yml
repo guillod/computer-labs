@@ -1,0 +1,13 @@
+- name: Download and unarchive command-configure
+  unarchive:
+    src: "{{ download_url[version] }}"
+    remote_src: yes
+    dest: "{{ unarchive_path }}"
+  when: ( not aptly_packages[package] ) or ( version is version(aptly_packages[package], '>') )
+  vars:
+    version: "{{ packages[package] }}"
+    download_url:
+      # see for example https://www.dell.com/support/home/en-us/product-support/product/precision-5820-workstation/drivers
+      # or https://www.dell.com/support/kbdoc/en-us/000178000/dell-command-configure
+      4.8.0: https://dl.dell.com/FOLDER08911312M/1/command-configure_4.8.0-494.ubuntu20_amd64.tar.gz
+      4.7.0: https://dl.dell.com/FOLDER08385603M/1/command-configure_4.7.0-433.ubuntu20_amd64.tar.gz

@@ -1,0 +1,24 @@
+- name: Correct link to machine-id
+  file:
+    src: /etc/machine-id
+    dest: /var/lib/dbus/machine-id
+    force: true
+    state: link
+  register: machineid
+  become: true
+
+- name: Delete machine-id
+  file:
+    path: /etc/machine-id
+    state: absent
+  become: true
+  when: machineid.changed
+
+- name: Regenerate machine-id
+  command: systemd-machine-id-setup
+  register: machineid_result
+  failed_when: machineid_result.stderr != "Initializing machine ID from random generator."
+  changed_when: machineid_result.stderr != ""
+  when: machineid.changed
+  become: true
+  notify: reboot

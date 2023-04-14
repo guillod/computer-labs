@@ -1,0 +1,31 @@
+galaxy_info:
+  author: Julien Guillod <julien.guillod@sorbonne-universite.fr>
+  description: Collection used to deploy and customize computer labs of the Mathematics Department of Sorbonne University.
+  company: Sorbonne University
+  license: AGPL-3.0-only
+  min_ansible_version: 2.11
+  platforms:
+  - name: Ubuntu
+    versions: [all]
+  - name: Debian
+    versions: [all]
+  galaxy_tags:
+  - labs
+  - tp
+  - mathematics
+  - su
+  - aptly
+  - deaduction
+  - flexlm
+  - maple
+  - mathematica
+  - mathlm
+  - matlab
+  - jupyterlab
+  - veyon
+  - bios
+  - guest
+  - nfs
+  - ldap
+  - firmware
+dependencies: []

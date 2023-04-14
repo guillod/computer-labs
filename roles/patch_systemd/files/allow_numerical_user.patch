@@ -1,0 +1,51 @@
+From: Julien Guillod
+Date: 1 Feb 2022
+Subject: [CUSTOM PATCH] Allow numerical username even in relaxed mode
+
+Even in relaxed mode (used for SSSD or Samba for example) systemd prevent numerical username,
+which are not POSIX compliant. This patch allows numerical username even in relaxed mode.
+
+The main reason is to permit login of users from an LDAP having numerical usernames.
+For such numerical logins it is expected that the username and uid match.
+Index: system2/src/basic/user-util.c
+===================================================================
+--- system2.orig/src/basic/user-util.c
++++ system2/src/basic/user-util.c
+@@ -714,9 +714,9 @@ bool valid_user_group_name(const char *u
+         if (isempty(u)) /* An empty user name is never valid */
+                 return false;
+ 
+-        if (parse_uid(u, NULL) >= 0) /* Something that parses as numeric UID string is valid exactly when the
+-                                      * flag for it is set */
+-                return FLAGS_SET(flags, VALID_USER_ALLOW_NUMERIC);
++        if (parse_uid(u, NULL) >= 0) /* Something that parses as numeric UID string is valid exactly when
++                                      * a least one numeric or relax flag is set */
++                return FLAGS_SET(flags, VALID_USER_ALLOW_NUMERIC) || FLAGS_SET(flags, VALID_USER_RELAX);
+ 
+         if (FLAGS_SET(flags, VALID_USER_RELAX)) {
+ 
+Index: system2/src/test/test-user-util.c
+===================================================================
+--- system2.orig/src/test/test-user-util.c
++++ system2/src/test/test-user-util.c
+@@ -68,8 +68,11 @@ static void test_valid_user_group_name_r
+ 
+         assert_se(!valid_user_group_name(NULL, VALID_USER_RELAX));
+         assert_se(!valid_user_group_name("", VALID_USER_RELAX));
+-        assert_se(!valid_user_group_name("1", VALID_USER_RELAX));
++        assert_se(valid_user_group_name("1", VALID_USER_RELAX));
++        assert_se(valid_user_group_name("65534", VALID_USER_RELAX));
+         assert_se(!valid_user_group_name("65535", VALID_USER_RELAX));
++        assert_se(valid_user_group_name("65536", VALID_USER_RELAX));
++        assert_se(valid_user_group_name("12345678", VALID_USER_RELAX));
+         assert_se(!valid_user_group_name("-1", VALID_USER_RELAX));
+         assert_se(!valid_user_group_name("foo\nbar", VALID_USER_RELAX));
+         assert_se(!valid_user_group_name("0123456789012345678901234567890123456789", VALID_USER_RELAX));
+@@ -156,6 +159,7 @@ static void test_valid_user_group_name_o
+         assert_se(valid_user_group_name("65534", VALID_USER_ALLOW_NUMERIC|VALID_USER_RELAX));
+         assert_se(!valid_user_group_name("65535", VALID_USER_ALLOW_NUMERIC|VALID_USER_RELAX));
+         assert_se(valid_user_group_name("65536", VALID_USER_ALLOW_NUMERIC|VALID_USER_RELAX));
++        assert_se(valid_user_group_name("12345678", VALID_USER_ALLOW_NUMERIC|VALID_USER_RELAX));
+         assert_se(!valid_user_group_name("-1", VALID_USER_ALLOW_NUMERIC|VALID_USER_RELAX));
+         assert_se(!valid_user_group_name("foo\nbar", VALID_USER_ALLOW_NUMERIC|VALID_USER_RELAX));
+         assert_se(!valid_user_group_name("0123456789012345678901234567890123456789", VALID_USER_ALLOW_NUMERIC|VALID_USER_RELAX));

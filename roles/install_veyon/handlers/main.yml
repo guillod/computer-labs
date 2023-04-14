@@ -1,0 +1,6 @@
+- name: enable and start veyon service
+  systemd:
+    name: veyon
+    state: restarted
+    enabled: true
+  become: true

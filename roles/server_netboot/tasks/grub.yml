@@ -1,0 +1,52 @@
+- name: Create grub directory
+  file:
+    path: /var/www/netboot/grub
+    state: directory
+  become: true
+
+- name: Download grub binary
+  get_url:
+    url: http://archive.ubuntu.com/ubuntu/dists/{{ ubuntu_codename }}/main/uefi/grub2-amd64/current/grubnetx64.efi.signed
+    dest: /var/www/netboot/bootx64.efi
+  become: true
+
+- name: Download Ubuntu {{ ubuntu_version }} Desktop ISO
+  get_url:
+    url: https://releases.ubuntu.com/{{ ubuntu_version }}/ubuntu-{{ ubuntu_version }}-desktop-amd64.iso
+    dest: /var/www/netboot/ubuntu-{{ ubuntu_version }}-desktop-amd64.iso
+  become: true
+
+- name: Extract kernel and initrd
+  community.general.iso_extract:
+    image: /var/www/netboot/ubuntu-{{ ubuntu_version }}-desktop-amd64.iso
+    dest: /var/www/netboot/
+    files:
+      - casper/initrd
+      - casper/vmlinuz
+  become: true
+
+- name: Add grub font
+  copy:
+    src: /boot/grub/unicode.pf2
+    dest: /var/www/netboot/grub/unicode.pf2
+  become: true
+  when: false
+
+- name: Configure grub
+  template:
+    src: grub.cfg
+    dest: /var/www/netboot/grub/grub.cfg
+  become: true
+
+- name: Generate encrypted password
+  no_log: true
+  command: "openssl passwd -6 -salt duitGj31361cR2Cf {{ password }}"
+  register: _encrypted_password
+
+- name: Add preseed
+  template:
+    src: preseed.cfg
+    dest: /var/www/netboot/preseed.cfg
+  vars:
+    encrypted_password: "{{ _encrypted_password.stdout }}"
+  become: true

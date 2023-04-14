@@ -1,0 +1,9 @@
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    eth0:
+      match:
+        name: {{ ansible_default_ipv4.interface }}
+      dhcp4: yes
+      wakeonlan: true

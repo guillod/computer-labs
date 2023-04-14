@@ -1,0 +1,30 @@
+- name: restart timesyncd
+  systemd:
+    state: restarted
+    name: systemd-timesyncd
+  become: true
+
+- name: restart systemd-resolved
+  systemd:
+    state: restarted
+    name: systemd-resolved
+  become: true
+
+- name: restart dnsmasq
+  systemd:
+    state: restarted
+    name: dnsmasq
+  become: true
+
+- name: update repository
+  command:
+    cmd: "aptly publish update focal :ubuntu"
+  become: true
+  environment:
+    HOME: "/home/admin"
+
+- name: reload nginx
+  systemd:
+    name: nginx
+    state: reloaded
+  become: true

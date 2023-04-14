@@ -1,0 +1,4 @@
+ubuntu_version: 20.04.6
+ubuntu_codename: "focal"
+password: "test"
+allowed_ips: ['any']

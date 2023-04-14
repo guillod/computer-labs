@@ -1,0 +1,30 @@
+- name: Setup custom repository server
+  hosts: tp-server
+  gather_facts: yes
+
+  collections:
+    - ufrmath.computer_labs
+
+  roles:
+
+  - role: server_repository
+    ntp_server: ntp.example.com
+    repository_name: "focal-tp"
+    
+  - role: add_deb
+    packages:
+      codium: latest
+      rstudio: latest
+      freefem: latest
+      veyon: latest
+      deaduction: latest
+      command-configure: '4.8.0'
+    files:
+      - /tmp/packages/mathematica_13.2.0_amd64.deb
+      - /tmp/packages/maple_2022.2_amd64.deb
+      - /tmp/packages/matlab_2022b3_amd64.deb
+
+  vars:
+    ansible_ssh_pass: test
+    ansible_become_pass: test
+    allowed_ips: [10.0.2.0/24, 10.0.3.0/24]

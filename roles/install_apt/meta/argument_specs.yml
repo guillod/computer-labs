@@ -1,0 +1,23 @@
+argument_specs:
+  main:
+    short_description: Install software through apt
+    description:
+     - Install scientific software through apt;
+     - Some packages require a custom repository see the role R(add_deb,ansible_collections.ufrmath.computer_labs.add_deb_role).
+    options:
+      repository_name:
+        type: "str"
+        default: "focal"
+        description: "name of the aptly repository"
+      unarchive_path:
+        type: "str"
+        default: '/tmp/aptly'
+        description: "path where to download deb"
+      packages:
+        type: "dict"
+        default: {}
+        description: "list of packages and version to add to the repository"
+      files:
+        type: "list"
+        default: []
+        description: "list of package files to add to the repository"

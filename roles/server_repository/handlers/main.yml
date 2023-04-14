@@ -1,0 +1,12 @@
+- name: update repository
+  command:
+    cmd: "aptly publish update {{ repository_name }} :ubuntu"
+  become: true
+  environment:
+    HOME: "/home/admin"
+
+- name: reload nginx
+  systemd:
+    name: nginx
+    state: reloaded
+  become: true

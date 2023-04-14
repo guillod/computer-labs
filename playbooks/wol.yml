@@ -1,0 +1,7 @@
+- name: Wake on LAN
+  hosts: computers
+  gather_facts: no
+  
+  roles:
+  - role: ufrmath.computer_labs.wol
+    broadcast: 10.0.2.255

@@ -1,0 +1,18 @@
+- name: Get VScodium download urls
+  delegate_to: localhost
+  run_once: true
+  uri:
+    url: "https://api.github.com/repos/VSCodium/vscodium/releases/{{ 'tags/' if version!='latest' }}{{ version }}"
+  vars:
+    version: "{{ packages[package] }}"
+  register: _response
+
+- name: Download VScodium {{ version }}
+  get_url:
+    url: "{{ url }}"
+    dest: "{{ unarchive_path }}"
+  when: ( not aptly_packages[package] ) or ( version is version(aptly_packages[package], '>') )
+  vars:
+    url: "{{ _response.json | to_json | from_json | json_query(query) | first }}"
+    version: "{{ _response.json.tag_name }}"
+    query: "assets[?ends_with(name,'amd64.deb')].browser_download_url"

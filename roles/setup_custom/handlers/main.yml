@@ -1,0 +1,34 @@
+- name: apply netplan
+  command: netplan apply
+  become: true
+  notify: reboot netplan
+
+- name: reboot netplan
+  reboot:
+  become: true
+
+- name: compile gschemas
+  command: glib-compile-schemas /usr/share/glib-2.0/schemas/
+  become: true
+
+- name: update grub
+  command: update-grub
+  become: true
+
+- name: restart timesyncd
+  systemd:
+    state: restarted
+    name: systemd-timesyncd
+  become: true
+
+- name: restart gdm
+  systemd:
+    name: gdm
+    state: restarted
+  become: true
+
+- name: restart sshd
+  systemd:
+    name: sshd
+    state: restarted
+  become: true

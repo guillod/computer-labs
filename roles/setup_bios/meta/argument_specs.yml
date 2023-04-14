@@ -1,0 +1,17 @@
+argument_specs:
+  main:
+    short_description: Configure Dell BIOS
+    description:
+     - Package C(command-configure) has to be available through a custom apt repository
+     - Install I(Dell Command | Configure application) thought apt;
+     - Add BIOS password if C(bios_password) is set;                                              
+     - Get and register service tag as fact C(service_tag);
+     - Loop over C(bios_settings) to modify BIOS settings if not already done.
+    options:
+      bios_password: 
+        type: "str"
+        description: "optional BIOS modification password"
+      bios_settings:
+        type: "dict"
+        default: {}
+        description: "dict of BIOS options to modify"

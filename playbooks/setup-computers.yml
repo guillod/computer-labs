@@ -1,0 +1,44 @@
+- name: Setup and customize just after Debian preseed finished the install
+  hosts: computers
+  gather_facts: no
+  force_handlers: yes
+  
+  collections:
+    - ufrmath.computer_labs
+
+  roles:
+
+  - role: setup_custom
+    ntp_server: ntp.example.com
+    ip_server: 10.0.2.2
+    custom_repository: "deb http://tp-server/ubuntu/ focal-tp main"
+    vars:
+      ansible_ssh_pass: test
+      ansible_become_pass: test
+
+  - role: setup_guest
+
+  - role: patch_systemd
+    delegate_build_to: tp-server
+
+  - role: setup_nfs_ldap
+    domain: "math.example.com"
+    ldap_uri: "ldap://ldap.math.example.com, ldap://ldap2.math.example.com"
+    ldap_search_base: "dc=math,dc=example,dc=com"
+    nfs_server: "nfs.math.example.com"
+    nfs_home_path: "/users/home"
+    when: "'debug' not in group_names"
+
+  - role: setup_bios
+    bios_password: test
+    bios_settings:
+      'WakeOnLan': 'LanOnly'
+      'DeepSleepCtrl': 'Disabled'
+      'UsbEmu': 'Disabled'
+      'BluetoothDevice': 'Disabled'
+      'SecureBoot': 'Enabled'
+
+  - role: setup_printer
+    printer_name: location
+    printer_ip: 10.0.2.3
+    when: "'location' in group_names"

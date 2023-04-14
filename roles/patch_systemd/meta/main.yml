@@ -1,0 +1,16 @@
+galaxy_info:
+  author: Julien Guillod <julien.guillod@sorbonne-universite.fr>
+  description: Ansible role to build patched systemd allowing numeric username.
+  company: Sorbonne University
+  license: AGPL-3.0-only
+  min_ansible_version: 2.11
+  platforms:
+  - name: Ubuntu
+    versions: [all]
+  galaxy_tags:
+  - labs
+  - tp
+  - mathematics
+  - su
+  - systemd
+dependencies: []

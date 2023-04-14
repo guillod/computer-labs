@@ -1,0 +1,40 @@
+[org.gnome.shell]
+favorite-apps = [ 'nautilus.desktop', 'gedit.desktop', 'gnome-terminal.desktop', 'firefox.desktop', 'lutes-rdp.desktop', 'yelp.desktop' ]
+
+[org.gnome.desktop.background]
+picture-uri = ''
+primary-color = '#41494c'
+
+[org.gnome.desktop.screensaver]
+picture-uri = ''
+primary-color = '#41494c'
+
+[org.gnome.desktop.sound]
+input-feedback-sounds = false
+event-sounds = false
+
+[org.gnome.login-screen]
+disable-user-list = true
+banner-message-enable = true
+banner-message-text = "Bienvenue dans les salles de TP de l'UFR de Mathématiques !\n\nAuthentification avec utilisateur et mot de passe Sorbonne Université.\n\nEn l'absence de compte Sorbonne Université, utiliser l'utilisateur \"guest\"."
+logo = '/usr/share/plymouth/ubuntu-su-logo.png'
+
+[org.gnome.settings-daemon.plugins.power]
+sleep-inactive-ac-timeout = 3600
+sleep-inactive-ac-type = 'logout'
+
+{% if proxy_env is defined %}
+[org.gnome.system.proxy]
+mode = 'manual'
+
+[org.gnome.system.proxy.http]
+host = '{{ proxy_env['http_proxy'] | urlsplit('hostname') }}'
+port = {{ proxy_env['http_proxy'] | urlsplit('port') }}
+
+[org.gnome.system.proxy.https]
+host = '{{ proxy_env['https_proxy'] | urlsplit('hostname') }}'
+port = {{ proxy_env['https_proxy'] | urlsplit('port') }}
+
+[org.gnome.system.proxy]
+ignore-hosts = {{ proxy_env['no_proxy'].split(',') }}
+{% endif %}

@@ -1,0 +1,20 @@
+- name: Refresh list of firmware
+  command: fwupdmgr refresh --force
+
+- name: Determine if update available
+  command: fwupdmgr get-updates --json
+  register: _response_update
+
+- name: Display updates
+  debug:
+    msg: "{{ _response_update.stdout | from_json }}"
+
+- name: Update firmware
+  command: fwupdmgr update -y --no-reboot-check --json
+  become: true
+  register: _response_upgrade
+  when: json.Devices | length > 0
+  failed_when: "'Successfully installed firmware' not in _response_upgrade.stdout"
+  vars:
+    json: "{{ _response_update.stdout | from_json }}"
+  notify: reboot

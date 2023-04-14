@@ -1,0 +1,41 @@
+- name: Create temporary directory
+  file:
+    path: "{{ unarchive_path }}"
+    state: directory
+    mode: '0700'
+
+- name: Get repository versions
+  command:
+    cmd: aptly repo search {%raw%}-format='{{.Version}}'{%endraw%} {{ repository_name }} {{ package }}
+  loop: "{{ packages | list }}"
+  loop_control:
+    loop_var: package
+  register: _response
+  failed_when: no
+  become: true
+
+- name: Define latest repository versions
+  no_log: true
+  set_fact:
+    aptly_packages: "{{ aptly_packages|default({}) | combine ({item.package : item.stdout | split('\n') | first }) }}"
+  with_items: "{{ _response.results }}"
+
+- name: Download software
+  include_tasks: "{{ package }}.yml"
+  loop: "{{ packages | list }}"
+  loop_control:
+    loop_var: package
+
+- name: Upload local deb
+  copy:
+    src: "{{ item }}"
+    dest: "{{ unarchive_path }}/"
+  with_fileglob: "{{ files }}"
+
+- name: Add packages to repository
+  command:
+    cmd: "aptly repo add -remove-files {{ repository_name }} {{ unarchive_path }}/"
+  register: _response
+  changed_when: "'[+]' in _response.stdout"
+  become: true
+  notify: update repository

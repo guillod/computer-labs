@@ -1,0 +1,23 @@
+- name: Copy rdp files
+  copy:
+    src: bdl-ext-1-lutes-upmc-fr.remmina
+    dest: /opt/lutes-rdp/
+  become: true
+
+- name: Add shortcut
+  copy:
+    src: lutes-rdp.desktop
+    dest: /usr/local/share/applications/
+  become: true
+
+- name: Create preference directory
+  file:
+    path: /etc/skel/.config/remmina
+    state: directory
+  become: true
+
+- name: Copy preferences (to prevent news dialog)
+  copy:
+    src: remmina.pref
+    dest: /etc/skel/.config/remmina/
+  become: true

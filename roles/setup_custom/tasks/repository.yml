@@ -1,0 +1,33 @@
+- name: Add server ip to /etc/hosts
+  lineinfile:
+    dest: /etc/hosts
+    regex: '[ \t]+tp-server$'
+    insertafter: '^127\.0\.1\.1[ \t]+'
+    line: '{{ ip_server }}	tp-server'
+  become: true
+  when: ip_server is defined
+
+- name: Add custom apt key
+  copy:
+    src: "{{ item }}"
+    dest: /etc/apt/trusted.gpg.d/
+  become: true
+  with_fileglob: '*.asc'
+
+- name: No proxy for custom apt repository
+  lineinfile:
+    dest: /etc/apt/apt.conf.d/01noproxy
+    regexp: '^Acquire::http::Proxy'
+    create: yes
+    state: present
+    line: 'Acquire::http::Proxy::tp-server DIRECT;'
+  become: true
+  when: (proxy_env is defined) and (custom_repository is defined)
+
+- name: Add custom apt repository
+  apt_repository:
+    repo: "{{ custom_repository }}"
+    state: present
+    filename: tp
+  become: true
+  when: custom_repository is defined

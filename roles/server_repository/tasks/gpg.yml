@@ -1,0 +1,24 @@
+
+
+- name: Try to retrieve a GPG key
+  shell: gpg1 --export --armor || gpg --export --armor
+  register: try_gpg_export
+
+- name: Generate a GPG key
+  block:
+    - name: Copy GPG key parameters
+      copy:
+        src: gpg_key.conf
+        dest: gpg_key.conf
+    - name: Generate GPG key
+      shell: gpg1 --batch --gen-key gpg_key.conf || gpg --batch --gen-key gpg_key.conf
+    - name: Retrieve GPG key
+      shell: gpg1 --export --armor || gpg --export --armor
+      register: gpg_export
+  when: "'nothing exported' in try_gpg_export.stderr"
+
+- name: Download public key
+  delegate_to: localhost
+  copy:
+    content: "{{ try_gpg_export.stdout if gpg_export.skipped else gpg_export.stdout }}"
+    dest: files/tp.asc

@@ -1,0 +1,13 @@
+- name: enable and start automount
+  systemd:
+    daemon_reload: yes
+    name: users-home.automount
+    state: started
+    enabled: true
+  become: true
+
+- name: restart sssd
+  systemd:
+    name: sssd
+    state: restarted
+  become: true

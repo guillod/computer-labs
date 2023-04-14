@@ -1,0 +1,7 @@
+argument_specs:
+  main:
+    short_description: Ping hosts and display logged users
+    description:
+     - ip addresses have to be present in Ansible cache;
+     - Ping hosts from localhost with C(ping -c 1 -w 1);
+     - For hosts which are up, retrieve and display logged users.

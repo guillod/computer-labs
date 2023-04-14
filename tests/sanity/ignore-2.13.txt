@@ -1,0 +1,3 @@
+plugins/modules/apt_policy.py validate-modules:missing-gplv3-license
+roles/install_pip/files/list-packages-local.py shebang
+roles/setup_custom/templates/01-networkd.yaml yamllint:unparsable-with-libyaml

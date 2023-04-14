@@ -1,0 +1,154 @@
+- name: Update apt cache
+  apt:
+    update_cache: yes
+  become: true
+
+- name: Install utilities
+  apt:
+    name:
+      - htop
+      - meld
+      - cifs-utils
+      - default-jre
+      - filezilla
+      - keepassxc
+      - lmod
+      - nano
+      - p7zip
+      - searchmonkey
+      - tidy
+      - unison-gtk
+      - unrar
+  become: true
+
+- name: Install languages utilities
+  apt:
+    name:
+      - aspell-fr
+      - mythes-fr
+      - mythes-en-*
+      - hunspell-fr
+      - hunspell-en-*
+      - hyphen-fr
+      - hyphen-en-*
+      - ienglish-common
+      - ifrench
+      - wamerican
+      - wbritish
+      - wfrench  
+  become: true
+  
+- name: Install python
+  apt:
+    name:
+      - python-is-python3
+      - python3-pip
+      - python3-venv
+      - python3-numpy
+      - python3-scipy
+      - python3-sympy
+      - python3-matplotlib
+      - python3-pandas
+      - python3-numba
+      - python3-networkx
+      - npm
+      - pyzo
+      - spyder
+  become: true
+
+- name: Install developpment
+  apt:
+    name:
+      - build-essential
+      - git
+      - automake
+      - cmake
+      - ddd
+      - valgrind
+      - gfortran
+      - gcc-10
+      - g++-10
+      - clang
+      - libeigen3-dev
+      - libsdl2-dev
+      - petsc-dev
+      - slepc-dev
+      - mpich
+      - openmpi-bin
+      - gmsh
+      - h5utils
+      - vim
+      - emacs
+      - geany
+      - geany-plugins
+      - codium
+  become: true
+
+- name: Install latex
+  apt:
+    name:
+      - biber
+      - cm-super
+      - chktex
+      - latexdiff
+      - lyx
+      - texlive-latex-extra
+      - texlive-lang-french
+      - texlive-luatex
+      - texlive-fonts-extra
+      - texlive-pictures
+      - texlive-pstricks
+      - texlive-publishers
+      - texlive-science
+      - texlive-xetex
+      - texstudio
+      - pandoc
+      - xindy
+  become: true
+  
+- name: Install graphics
+  apt:
+    name:
+      - gimp
+      - webp
+      - vlc
+      - trimage
+      - scribus
+      - optipng
+      - imagemagick
+      - inkscape
+      - pdfarranger
+      - pdftk
+      - pdfshuffler
+      - diffpdf
+      - ffmpeg
+      - xournal
+  become: true
+
+- name: Install scilab
+  apt:
+    name:
+      - scilab
+  become: true
+
+- name: Install R
+  apt:
+    name:
+      - r-base
+      - r-cran-irkernel
+      - r-cran-gridextra
+      - r-cran-shiny
+      - rstudio
+  become: true
+
+- name: Install scientific
+  apt:
+    name:
+      - scilab
+      - gnuplot
+      - freefem
+      - mathematica
+      - matlab
+      - maple
+      - deaduction
+  become: true
